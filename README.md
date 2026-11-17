@@ -1,7 +1,14 @@
+# Recipe Master
 
-## Windows 11: verified launch method, one command at a time
+A recipe discovery browser app with a **local Express backend proxy**. The browser must never contain the Spoonacular API key.
 
-This repository's main UI is a **static website**. You do not need `pip install`, a virtual environment, or an npm build to serve it. Install Git and Python 3, then run:
+## Security notice
+
+An old Spoonacular API key was previously committed to public `main.js`. **Revoke that key in Spoonacular before using this app**. Removing it from current code does not remove it from historical commits, third-party forks, or cached browser assets.
+
+## Windows 11: clone and run, one PowerShell command per step
+
+Install Git and Node.js 22 LTS, then run each command individually:
 
 ```powershell
 git clone https://github.com/Tyler-Keesee/Recipe-Master.git
@@ -12,15 +19,51 @@ Set-Location .\Recipe-Master
 ```
 
 ```powershell
-python -m http.server 8000
+node --version
 ```
 
-Open **http://localhost:8000/** in Edge or Chrome while the server runs; press **Ctrl+C** to stop it.
+```powershell
+npm --version
+```
 
-**Important:** Security concern: the existing client-side JavaScript contains a hard-coded API key. Treat that key as exposed and revoke/rotate it at the API provider before further use. A public static frontend cannot safely hold a private API credential. Search may fail without a properly secured backend.
+```powershell
+npm ci
+```
 
-**Scope of verification:** Serving files is not equivalent to testing every feature, external API, or storage operation. Open Developer Tools (F12) if a feature fails.
+```powershell
+Copy-Item .env.example .env
+```
 
----
+```powershell
+notepad .env
+```
 
-# Recipe-Master
+Set `SPOONACULAR_API_KEY` to a **newly issued** key from the Spoonacular dashboard. Never commit the `.env` file.
+
+```powershell
+npm test
+```
+
+```powershell
+npm start
+```
+
+Open **http://127.0.0.1:3000/** in Edge or Chrome; stop with Ctrl+C. Unlike the older version, starting a static `python -m http.server` is **not sufficient** for API-backed recipe search: a backend is needed so the key is never sent to the browser.
+
+## Troubleshooting and deployment
+
+- The server listens on `127.0.0.1` only. Do **not** expose this demo directly to the public internet or copy a live API key into browser code.
+- `503` means the server has no API key; `429` means local request limit; `502` means the provider request failed.
+- `npm test` mocks the provider. Live recipe results require a valid new key, internet access, and sufficient Spoonacular quota.
+- For a public deployment, add a production backend with authenticated/rate-limited access, quotas and monitoring. GitHub Pages alone cannot securely store a private API key.
+
+## Updating an existing clone
+
+```powershell
+git pull --ff-only
+```
+
+```powershell
+npm ci
+```
+
