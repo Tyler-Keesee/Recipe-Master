@@ -1,0 +1,26 @@
+name: Recipe Master security and clone checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: No embedded browser API key
+        shell: bash
+        run: |
+          if grep -E '([A-Za-z0-9]{32}|apiKey=\$\{API_KEY\})' main.js | grep -E 'API_KEY|apiKey'; then
+            echo "Possible embedded credential in browser JS"
+            exit 1
+          fi
