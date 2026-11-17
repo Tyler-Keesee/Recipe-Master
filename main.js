@@ -1,6 +1,5 @@
 // Configuration settings for Recipe Master
 const config = {
-    ,
     BASE_URL: '/api/recipes',
     CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
     MAX_REQUESTS_PER_DAY: 150,
