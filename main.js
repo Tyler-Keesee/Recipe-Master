@@ -1,7 +1,7 @@
 // Configuration settings for Recipe Master
 const config = {
-    API_KEY: '528d47657a174064992e9b1bc685695a',
-    BASE_URL: 'https://api.spoonacular.com/recipes',
+    ,
+    BASE_URL: '/api/recipes',
     CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
     MAX_REQUESTS_PER_DAY: 150,
     defaultParams: {
@@ -21,8 +21,7 @@ const RECIPE_PREFERENCES = {
     }
 };
 
-const BASE_URL = 'https://api.spoonacular.com/recipes';
-const API_KEY = '528d47657a174064992e9b1bc685695a';
+const BASE_URL = '/api/recipes';
 
 class RequestQueue {
     constructor() {
@@ -298,8 +297,7 @@ class APIClient {
     }
 
     buildUrl(endpoint, params) {
-        const url = new URL(`${this.config.BASE_URL}${endpoint}`);
-        url.searchParams.append('apiKey', this.config.API_KEY);
+        const url = new URL(`${this.config.BASE_URL}${endpoint}`, window.location.origin);
         Object.entries(params).forEach(([key, value]) => {
             url.searchParams.append(key, value);
         });
@@ -706,7 +704,7 @@ class Favorites {
     }
 
     async fetchRecipeDetails(recipeId) {
-        const response = await fetch(`${BASE_URL}/${recipeId}/information?apiKey=${API_KEY}`);
+        const response = await fetch(`${BASE_URL}/${encodeURIComponent(recipeId)}/information`);
         if (!response.ok) {
             throw new Error('API request failed');
         }
@@ -1425,7 +1423,7 @@ class RecipeMaster {
 
         // If not in cache or expired, fetch from API
         try {
-            const response = await fetch(`${BASE_URL}/${id}/information?apiKey=${API_KEY}`);
+            const response = await fetch(`${BASE_URL}/${encodeURIComponent(id)}/information`);
             if (!response.ok) throw new Error('API request failed');
             const data = await response.json();
             
